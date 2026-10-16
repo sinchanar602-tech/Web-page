@@ -1,0 +1,243 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>My Calculator</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #dbeafe, #e9d5ff);
+            font-family: Arial, sans-serif;
+        }
+
+        .calculator {
+            width: 320px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px #00000020;
+        }
+
+        h2 {
+            text-align: center;
+            color: #1e293b;
+        }
+
+        #display {
+            width: 100%;
+            height: 70px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #f1f5f9;
+            text-align: right;
+            font-size: 28px;
+            color: #0f172a;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            height: 55px;
+            border: none;
+            border-radius: 12px;
+            background: #e2e8f0;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #cbd5e1;
+        }
+
+        .operator {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .clear {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .equal {
+            background: #2563eb;
+            color: white;
+        }
+
+        .equal:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="calculator">
+        <h2>Calculator</h2>
+
+        <input type="text" id="display"
+               value="0" readonly>
+
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">AC</button>
+            <button class="operator" onclick="deleteLast()">DEL</button>
+            <button class="operator" onclick="percentage()">%</button>
+            <button class="operator" onclick="chooseOperator('/')">÷</button>
+
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button class="operator" onclick="chooseOperator('*')">×</button>
+
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button class="operator" onclick="chooseOperator('-')">−</button>
+
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button class="operator" onclick="chooseOperator('+')">+</button>
+
+            <button onclick="toggleSign()">±</button>
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button class="equal" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById("display");
+
+        let firstNumber = null;
+        let operator = null;
+        let shouldReset = false;
+
+        function appendNumber(number) {
+            if (display.value === "Error") {
+                display.value = "0";
+            }
+
+            if (shouldReset) {
+                display.value = number === "." ? "0." : number;
+                shouldReset = false;
+                return;
+            }
+
+            if (number === "." && display.value.includes(".")) {
+                return;
+            }
+
+            if (display.value === "0" && number !== ".") {
+                display.value = number;
+            } else {
+                display.value += number;
+            }
+        }
+
+        function chooseOperator(selectedOperator) {
+            firstNumber = Number(display.value);
+            operator = selectedOperator;
+            shouldReset = true;
+        }
+
+        function calculate() {
+            if (operator === null || firstNumber === null) {
+                return;
+            }
+
+            const secondNumber = Number(display.value);
+            let result;
+
+            switch (operator) {
+                case "+":
+                    result = firstNumber + secondNumber;
+                    break;
+
+                case "-":
+                    result = firstNumber - secondNumber;
+                    break;
+
+                case "*":
+                    result = firstNumber * secondNumber;
+                    break;
+
+                case "/":
+                    if (secondNumber === 0) {
+                        display.value = "Error";
+                        firstNumber = null;
+                        operator = null;
+                        shouldReset = true;
+                        return;
+                    }
+                    result = firstNumber / secondNumber;
+                    break;
+            }
+
+            display.value = String(
+                Number(result.toPrecision(10))
+            );
+
+            firstNumber = null;
+            operator = null;
+            shouldReset = true;
+        }
+
+        function clearDisplay() {
+            display.value = "0";
+            firstNumber = null;
+            operator = null;
+            shouldReset = false;
+        }
+
+        function deleteLast() {
+            if (shouldReset || display.value === "Error") {
+                display.value = "0";
+                shouldReset = false;
+                return;
+            }
+
+            display.value = display.value.length > 1
+                ? display.value.slice(0, -1)
+                : "0";
+        }
+
+        function percentage() {
+            if (display.value !== "Error") {
+                display.value = String(
+                    Number(display.value) / 100
+                );
+                shouldReset = true;
+            }
+        }
+
+        function toggleSign() {
+            if (display.value !== "Error") {
+                display.value = String(
+                    Number(display.value) * -1
+                );
+            }
+        }
+    </script>
+
+</body>
+</html>
